@@ -1,0 +1,35 @@
+{
+    "Subjective Ethical Reasoning": [
+      {"Model": "deepseek-r1-7b-sft", "Type": "Ours", "RiskRate": 0.0320, "QualityScore": 0.9924, "ComprehensiveScore": 0.9356},
+      {"Model": "deepseek-r1-7b", "Type": "DeepSeek", "RiskRate": 0.1624, "QualityScore": 0.4667, "ComprehensiveScore": 0.2292},
+      {"Model": "deepseek-r1-671b", "Type": "DeepSeek", "RiskRate": 0.0338, "QualityScore": 0.8736, "ComprehensiveScore": 0.8103},
+      {"Model": "deepseek-v3-671b", "Type": "DeepSeek", "RiskRate": 0.0425, "QualityScore": 0.8342, "ComprehensiveScore": 0.7561},
+      {"Model": "gpt3.5", "Type": "GPT", "RiskRate": 0.2239, "QualityScore": 0.5698, "ComprehensiveScore": 0.2184},
+      {"Model": "gpt4-turbo", "Type": "GPT", "RiskRate": 0.1036, "QualityScore": 0.6047, "ComprehensiveScore": 0.4387},
+      {"Model": "gpt4", "Type": "GPT", "RiskRate": 0.1607, "QualityScore": 0.5994, "ComprehensiveScore": 0.3434},
+      {"Model": "doubao", "Type": "General-purpose", "RiskRate": 0.1395, "QualityScore": 0.4589, "ComprehensiveScore": 0.2552},
+      {"Model": "ernie4", "Type": "General-purpose", "RiskRate": 0.1143, "QualityScore": 0.6230, "ComprehensiveScore": 0.4370},
+      {"Model": "qwen2.5-7b", "Type": "General-purpose", "RiskRate": 0.1386, "QualityScore": 0.6218, "ComprehensiveScore": 0.3976},
+      {"Model": "qwen2.5-72b", "Type": "General-purpose", "RiskRate": 0.0848, "QualityScore": 0.7042, "ComprehensiveScore": 0.5596},
+      {"Model": "huatuogpt-o1-7b", "Type": "MedicalLLM", "RiskRate": 0.1518, "QualityScore": 0.6564, "ComprehensiveScore": 0.4055},
+      {"Model": "jingyiqianxun", "Type": "MedicalLLM", "RiskRate": 0.0616, "QualityScore": 0.6764, "ComprehensiveScore": 0.5738}
+    ],
+  
+    "Objective Tasks": [
+      {"Model": "deepseek-r1-7b-sft", "Type": "Ours", "EKAcc": 43.1, "DSAcc": 52.8, "ECAcc": 61.6},
+      {"Model": "deepseek-r1-7b-rag", "Type": "Ours", "EKAcc": 58.6, "DSAcc": 82.4, "ECAcc": 91.2},
+      {"Model": "deepseek-r1-7b", "Type": "DeepSeek", "EKAcc": 26.8, "DSAcc": 34.7, "ECAcc": 41.0},
+      {"Model": "deepseek-r1-671b", "Type": "DeepSeek", "EKAcc": 60.2, "DSAcc": 88.4, "ECAcc": 89.1},
+      {"Model": "deepseek-v3-671b", "Type": "DeepSeek", "EKAcc": 56.5, "DSAcc": 85.9, "ECAcc": 88.6},
+      {"Model": "gpt3.5", "Type": "GPT", "EKAcc": 29.3, "DSAcc": 45.8, "ECAcc": 53.2},
+      {"Model": "gpt4-turbo", "Type": "GPT", "EKAcc": 43.4, "DSAcc": 69.2, "ECAcc": 70.8},
+      {"Model": "gpt4", "Type": "GPT", "EKAcc": 42.8, "DSAcc": 65.9, "ECAcc": 71.1},
+      {"Model": "doubao", "Type": "General-purpose", "EKAcc": 48.2, "DSAcc": 85.4, "ECAcc": 89.5},
+      {"Model": "ernie4", "Type": "General-purpose", "EKAcc": 54.5, "DSAcc": 78.7, "ECAcc": 84.3},
+      {"Model": "qwen2.5-7b", "Type": "General-purpose", "EKAcc": 45.2, "DSAcc": 73.0, "ECAcc": 82.0},
+      {"Model": "qwen2.5-72b", "Type": "General-purpose", "EKAcc": 54.1, "DSAcc": 84.1, "ECAcc": 89.2},
+      {"Model": "huatuogpt-o1-7b", "Type": "MedicalLLM", "EKAcc": 3.6, "DSAcc": 20.4, "ECAcc": 15.0},
+      {"Model": "jingyiqianxun", "Type": "MedicalLLM", "EKAcc": 54.6, "DSAcc": 87.7, "ECAcc": 91.8}
+    ]
+  }
+  

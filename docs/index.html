@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Medical Ethics LLM Leaderboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+        .header {
+            background: #ffffff;
+            color: #333333;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333333;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #666666;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #6c757d;
+        }
+
+        .tab.active {
+            background: white;
+            color: #333333;
+            border-bottom: 3px solid #007bff;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .benchmark-section {
+            margin-bottom: 40px;
+        }
+
+        .benchmark-title {
+            font-size: 1.8em;
+            color: #333333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+            display: flex;
+            align-items: center;
+        }
+
+        .benchmark-title::before {
+            content: "📊";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .metric-explanation {
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .metric-explanation p {
+            margin: 5px 0;
+            color: #000000;
+        }
+
+        .metric-explanation strong {
+            color: #000000;
+        }
+
+        .github-link {
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .github-link p {
+            margin: 0;
+            color: #333333;
+            font-size: 0.95em;
+        }
+
+        .github-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .github-link a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 800px;
+            border: 1px solid #e1e5e9;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #333333;
+            padding: 15px 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95em;
+            border-bottom: 2px solid #e1e5e9;
+            border-right: 1px solid #e1e5e9;
+        }
+
+        th:last-child {
+            border-right: none;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e1e5e9;
+            font-size: 0.9em;
+        }
+
+        td:last-child {
+            border-right: none;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tr:hover {
+            background: #e3f2fd;
+        }
+
+        .model-name {
+            font-weight: 600;
+            color: #333333;
+            text-align: left;
+        }
+
+        .type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+            color: white;
+        }
+
+        .type-ours { background: #B8C8B8; }
+        .type-deepseek { background: #A8C8C8; }
+        .type-gpt { background: #C8B8C8; }
+        .type-general-purpose { background: #B8B8C8; }
+        .type-medicallm { background: #C8B8B8; }
+
+        .score-cell {
+            position: relative;
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #e1e5e9;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #333333;
+            background: #f8f9fa;
+        }
+
+        .score-cell:last-child {
+            border-right: none;
+        }
+
+        .score-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            transition: width 0.3s ease;
+            opacity: 0.3;
+        }
+
+        .score-bar-high { background: rgba(40, 167, 69, 0.3); }
+        .score-bar-medium { background: rgba(255, 193, 7, 0.3); }
+        .score-bar-low { background: rgba(220, 53, 69, 0.3); }
+
+        .score-high { color: #28a745; }
+        .score-medium { color: #ffc107; }
+        .score-low { color: #dc3545; }
+
+        .score-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .rank {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .rank-1, .rank-2, .rank-3 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin: 0 auto;
+        }
+
+        td:first-child {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .rank-1 { 
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #8b6914;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+        .rank-2 { 
+            background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+            color: #666666;
+            box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
+        }
+        .rank-3 { 
+            background: linear-gradient(135deg, #cd7f32, #daa520);
+            color: #8b4513;
+            box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 25px;
+            font-size: 1em;
+            min-width: 250px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .sort-btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .sort-btn:hover {
+            background: #0056b3;
+        }
+
+        .sort-btn.active {
+            background: #28a745;
+        }
+
+        /* Radar Chart Styles */
+        .radar-chart-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e1e5e9;
+        }
+
+        .radar-chart {
+            width: 100%;
+            height: 450px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                padding: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Chinese Medical Ethics LLM Leaderboard</h1>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('medes')">MedES</button>
+            <button class="tab" onclick="switchTab('medethiceval')">MedEthicEval</button>
+        </div>
+
+        <!-- MedES Benchmark -->
+        <div id="medes" class="tab-content active">
+
+            <!-- Subjective Ethical Reasoning -->
+            <div class="benchmark-section">
+                <h2 class="benchmark-title">Subjective Ethical Reasoning</h2>
+                <div class="controls">
+                    <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('subjective-table', this.value)">
+                    <button class="sort-btn" onclick="sortTable('subjective-table', 'ComprehensiveScore')">Sort by Comprehensive Score</button>
+                    <button class="sort-btn" onclick="sortTable('subjective-table', 'RiskRate')">Sort by Risk Rate</button>
+                </div>
+                <div class="table-container">
+                    <table id="subjective-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Model Name</th>
+                                <th>Type</th>
+                                <th>Risk Rate</th>
+                                <th>Quality Score</th>
+                                <th>Comprehensive Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjective-tbody">
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+
+            <!-- Objective Tasks -->
+            <div class="benchmark-section">
+                <h2 class="benchmark-title">Objective Tasks</h2>
+                <div class="controls">
+                    <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('objective-table', this.value)">
+                    <button class="sort-btn" onclick="sortTable('objective-table', 'EKAcc')">Sort by Ethics Knowledge Accuracy</button>
+                    <button class="sort-btn" onclick="sortTable('objective-table', 'DSAcc')">Sort by Decision Support Accuracy</button>
+                    <button class="sort-btn" onclick="sortTable('objective-table', 'ECAcc')">Sort by Ethics Conflict Accuracy</button>
+                </div>
+                <div class="table-container">
+                    <table id="objective-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Model Name</th>
+                                <th>Type</th>
+                                <th>Ethics Knowledge Accuracy</th>
+                                <th>Decision Support Accuracy</th>
+                                <th>Ethics Conflict Accuracy</th>
+                            </tr>
+                        </thead>
+                        <tbody id="objective-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- MedES Combined Radar Chart -->
+            <div class="radar-chart-container">
+                <div id="medes-combined-radar" class="radar-chart"></div>
+            </div>
+        </div>
+
+        <!-- MedEthicEval Benchmark -->
+        <div id="medethiceval" class="tab-content">
+            <div class="github-link">
+                <p>🗃️ <strong>Data Source:</strong> <a href="https://github.com/X-LANCE/MedEthicEval" target="_blank" rel="noopener noreferrer">MedEthicEval Dataset</a></p>
+            </div>
+
+            <!-- Knowledge -->
+            <div class="benchmark-section">
+                <h2 class="benchmark-title">Knowledge Assessment</h2>
+                <div class="controls">
+                    <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('knowledge-table', this.value)">
+                    <button class="sort-btn" onclick="sortTable('knowledge-table', 'Accuracy')">Sort by Accuracy</button>
+                </div>
+                <div class="table-container">
+                    <table id="knowledge-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Model Name</th>
+                                <th>Parameters</th>
+                                <th>Accuracy</th>
+                            </tr>
+                        </thead>
+                        <tbody id="knowledge-tbody">
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+
+            <!-- Detecting Violation -->
+            <div class="benchmark-section">
+                <h2 class="benchmark-title">Violation Detection</h2>
+                <div class="controls">
+                    <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('violation-table', this.value)">
+                    <button class="sort-btn" onclick="sortTable('violation-table', 'Safe')">Sort by Safety Score</button>
+                </div>
+                <div class="table-container">
+                    <table id="violation-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Model Name</th>
+                                <th>Safety Score</th>
+                                <th>Score -1</th>
+                                <th>Score 0</th>
+                                <th>Score 1</th>
+                                <th>Score 2</th>
+                            </tr>
+                        </thead>
+                        <tbody id="violation-tbody">
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+
+            <!-- Attack Prompts -->
+            <div class="benchmark-section">
+                <h2 class="benchmark-title">Attack Prompts</h2>
+                <div class="controls">
+                    <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('attack-table', this.value)">
+                    <button class="sort-btn" onclick="sortTable('attack-table', 'UR')">Sort by UR</button>
+                    <button class="sort-btn" onclick="sortTable('attack-table', 'VD')">Sort by VD</button>
+                </div>
+                <div class="table-container">
+                    <table id="attack-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Model Name</th>
+                                <th>UR</th>
+                                <th>VD</th>
+                                <th>RP</th>
+                                <th>ES</th>
+                                <th>PHJ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attack-tbody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="metric-explanation">
+                    <p><strong>UR = User Reality, VD = Vague Description, RP = Role Play, ES = Extreme Situation, PHJ = Post-hoc Justification</strong></p>
+                </div>
+                
+            </div>
+
+            <!-- Priority Dilemma -->
+            <div class="benchmark-section">
+                <h2 class="benchmark-title">Priority Dilemma</h2>
+                <div class="controls">
+                    <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('priority-table', this.value)">
+                    <button class="sort-btn" onclick="sortTable('priority-table', 'Safe')">Sort by Safety Score</button>
+                </div>
+                <div class="table-container">
+                    <table id="priority-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Model Name</th>
+                                <th>Safety Score</th>
+                                <th>Score -1</th>
+                                <th>Score 0</th>
+                                <th>Score 1</th>
+                                <th>Score 2</th>
+                                <th>Score 3</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priority-tbody">
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+
+            <!-- Equilibrium Dilemma -->
+            <div class="benchmark-section">
+                <h2 class="benchmark-title">Equilibrium Dilemma</h2>
+                <div class="controls">
+                    <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('equilibrium-table', this.value)">
+                    <button class="sort-btn" onclick="sortTable('equilibrium-table', 'Safe')">Sort by Safety Score</button>
+                </div>
+                <div class="table-container">
+                    <table id="equilibrium-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Model Name</th>
+                                <th>Safety Score</th>
+                                <th>Score -1</th>
+                                <th>Score 0</th>
+                                <th>Score 1</th>
+                                <th>Score 2</th>
+                                <th>Score 3</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equilibrium-tbody">
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+            
+            <!-- MedEthicEval Combined Radar Chart -->
+            <div class="radar-chart-container">
+                <div id="medethiceval-combined-radar" class="radar-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Radar Charts JavaScript -->
+    <script src="js/medes-radar-charts.js"></script>
+    <script src="js/medethiceval-radar-charts.js"></script>
+    
+    <script>
+        // Data
+        let medesData = {};
+
+        let medEthicEvalData = {};
+
+        // Switch tabs
+        function switchTab(tabName) {
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activate selected tab
+            event.target.classList.add('active');
+        }
+
+        // Get type style class
+        function getTypeClass(type) {
+            const typeMap = {
+                'Ours': 'type-ours',
+                'DeepSeek': 'type-deepseek',
+                'GPT': 'type-gpt',
+                'General-purpose': 'type-general-purpose',
+                'MedicalLLM': 'type-medicallm'
+            };
+            return typeMap[type] || 'type-general-purpose';
+        }
+
+        // Get score class for text color
+        function getScoreClass(value) {
+            if (value >= 0.8) return 'score-high';
+            if (value >= 0.5) return 'score-medium';
+            return 'score-low';
+        }
+
+        // Get score cell HTML for MedEthicEval Attack Prompts (0-2 range, adjusted thresholds)
+        function getScoreCellHtmlAttack(value) {
+            let barClass = 'score-bar-medium';
+            let percentage = value / 2; // Normalize to 0-1 range
+            
+            // Adjusted thresholds for Attack Prompts data (0.53-1.45 range)
+            if (value >= 1.2) barClass = 'score-bar-high';
+            else if (value >= 0.9) barClass = 'score-bar-medium';
+            else barClass = 'score-bar-low';
+            
+            return `<td class="score-cell">
+                <div class="score-bar-fill ${barClass}" style="width: ${percentage * 100}%"></div>
+                <div class="score-text">${value.toFixed(2)}</div>
+            </td>`;
+        }
+
+        // Get score cell HTML for MedEthicEval Dilemma (0-100 range, adjusted thresholds)
+        function getScoreCellHtmlDilemma(value) {
+            let barClass = 'score-bar-medium';
+            let percentage = value / 100; // Normalize to 0-1 range
+            
+            // Adjusted thresholds for Dilemma data (0-70 range)
+            if (value >= 50) barClass = 'score-bar-high';
+            else if (value >= 20) barClass = 'score-bar-medium';
+            else barClass = 'score-bar-low';
+            
+            return `<td class="score-cell">
+                <div class="score-bar-fill ${barClass}" style="width: ${percentage * 100}%"></div>
+                <div class="score-text">${value}</div>
+            </td>`;
+        }
+
+        // Get score cell HTML for MedES Subjective Ethical Reasoning (0-1 range, 4 decimal places)
+        function getScoreCellHtml(value, isReverse = false) {
+            let barClass = 'score-bar-medium';
+            let percentage = value;
+            
+            if (isReverse) {
+                // For risk rate, lower is better - invert the percentage
+                percentage = 1 - value;
+                if (value <= 0.05) barClass = 'score-bar-high';
+                else if (value <= 0.1) barClass = 'score-bar-medium';
+                else barClass = 'score-bar-low';
+            } else {
+                // For scores, higher is better
+                if (value >= 0.8) barClass = 'score-bar-high';
+                else if (value >= 0.5) barClass = 'score-bar-medium';
+                else barClass = 'score-bar-low';
+            }
+            
+            const displayValue = (value * 100).toFixed(2) + '%';
+            
+            return `
+                <td class="score-cell">
+                    <div class="score-bar-fill ${barClass}" style="width: ${percentage * 100}%"></div>
+                    <div class="score-text">${displayValue}</div>
+                </td>
+            `;
+        }
+
+        // Get score cell HTML for MedEthicEval Knowledge (0-1 range, narrow range 0.7-0.85)
+        function getScoreCellHtmlKnowledge(value) {
+            let barClass = 'score-bar-medium';
+            let percentage = value;
+            
+            // Adjusted thresholds for Knowledge data (0.7-0.85 range)
+            if (value >= 0.80) barClass = 'score-bar-high';
+            else if (value >= 0.75) barClass = 'score-bar-medium';
+            else barClass = 'score-bar-low';
+            
+            const displayValue = Math.round(value * 100) + '%';
+            
+            return `
+                <td class="score-cell">
+                    <div class="score-bar-fill ${barClass}" style="width: ${percentage * 100}%"></div>
+                    <div class="score-text">${displayValue}</div>
+                </td>
+            `;
+        }
+
+        // Get score cell HTML for MedEthicEval Violation Detection (0-1 range, wide range 0.01-0.87)
+        function getScoreCellHtmlViolation(value) {
+            let barClass = 'score-bar-medium';
+            let percentage = value;
+            
+            // Adjusted thresholds for Violation data (0.01-0.87 range)
+            if (value >= 0.60) barClass = 'score-bar-high';
+            else if (value >= 0.30) barClass = 'score-bar-medium';
+            else barClass = 'score-bar-low';
+            
+            const displayValue = Math.round(value * 100) + '%';
+            
+            return `
+                <td class="score-cell">
+                    <div class="score-bar-fill ${barClass}" style="width: ${percentage * 100}%"></div>
+                    <div class="score-text">${displayValue}</div>
+                </td>
+            `;
+        }
+
+        // Get score cell HTML for percentage values
+        function getScoreCellHtmlPercent(value) {
+            let barClass = 'score-bar-medium';
+            let percentage = value / 100;
+            
+            if (value >= 80) barClass = 'score-bar-high';
+            else if (value >= 50) barClass = 'score-bar-medium';
+            else barClass = 'score-bar-low';
+            
+            return `
+                <td class="score-cell">
+                    <div class="score-bar-fill ${barClass}" style="width: ${percentage * 100}%"></div>
+                    <div class="score-text">${value.toFixed(1)}%</div>
+                </td>
+            `;
+        }
+
+        // Get rank style class
+        function getRankClass(rank) {
+            if (rank === 1) return 'rank-1';
+            if (rank === 2) return 'rank-2';
+            if (rank === 3) return 'rank-3';
+            return '';
+        }
+
+        // Render MedES data
+        function renderMedESData() {
+            // Render subjective ethical reasoning table
+            const subjectiveData = [...medesData["Subjective Ethical Reasoning"]];
+            subjectiveData.sort((a, b) => b.ComprehensiveScore - a.ComprehensiveScore);
+            
+            const subjectiveTbody = document.getElementById('subjective-tbody');
+            subjectiveTbody.innerHTML = '';
+            
+            subjectiveData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank ${getRankClass(index + 1)}">${index + 1}</td>
+                    <td class="model-name">${item.Model}</td>
+                    <td><span class="type-badge ${getTypeClass(item.Type)}">${item.Type}</span></td>
+                    ${getScoreCellHtml(item.RiskRate, true)}
+                    ${getScoreCellHtml(item.QualityScore)}
+                    ${getScoreCellHtml(item.ComprehensiveScore)}
+                `;
+                subjectiveTbody.appendChild(row);
+            });
+
+            // Render objective tasks table
+            const objectiveData = [...medesData["Objective Tasks"]];
+            objectiveData.sort((a, b) => (b.EKAcc + b.DSAcc + b.ECAcc) - (a.EKAcc + a.DSAcc + a.ECAcc));
+            
+            const objectiveTbody = document.getElementById('objective-tbody');
+            objectiveTbody.innerHTML = '';
+            
+            objectiveData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank ${getRankClass(index + 1)}">${index + 1}</td>
+                    <td class="model-name">${item.Model}</td>
+                    <td><span class="type-badge ${getTypeClass(item.Type)}">${item.Type}</span></td>
+                    ${getScoreCellHtmlPercent(item.EKAcc)}
+                    ${getScoreCellHtmlPercent(item.DSAcc)}
+                    ${getScoreCellHtmlPercent(item.ECAcc)}
+                `;
+                objectiveTbody.appendChild(row);
+            });
+        }
+
+        // Render MedEthicEval data
+        function renderMedEthicEvalData() {
+            // Render knowledge assessment table
+            const knowledgeData = [...medEthicEvalData["Knowledge"]];
+            knowledgeData.sort((a, b) => b.Accuracy - a.Accuracy);
+            
+            const knowledgeTbody = document.getElementById('knowledge-tbody');
+            knowledgeTbody.innerHTML = '';
+            
+            knowledgeData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank ${getRankClass(index + 1)}">${index + 1}</td>
+                    <td class="model-name">${item.Model}</td>
+                    <td>${item.Params}</td>
+                    ${getScoreCellHtmlKnowledge(item.Accuracy)}
+                `;
+                knowledgeTbody.appendChild(row);
+            });
+
+            // Render violation detection table
+            const violationData = [...medEthicEvalData["Detecting Violation"]];
+            violationData.sort((a, b) => b.Safe - a.Safe);
+            
+            const violationTbody = document.getElementById('violation-tbody');
+            violationTbody.innerHTML = '';
+            
+            violationData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank ${getRankClass(index + 1)}">${index + 1}</td>
+                    <td class="model-name">${item.Model}</td>
+                    ${getScoreCellHtmlViolation(item.Safe)}
+                    ${getScoreCellHtmlViolation(item['-1'])}
+                    ${getScoreCellHtmlViolation(item['0'])}
+                    ${getScoreCellHtmlViolation(item['1'])}
+                    ${getScoreCellHtmlViolation(item['2'])}
+                `;
+                violationTbody.appendChild(row);
+            });
+
+            // Render attack prompts table
+            const attackData = [...medEthicEvalData["Attack Prompts"]];
+            attackData.sort((a, b) => (b.UR + b.VD + b.RP + b.ES + b.PHJ) - (a.UR + a.VD + a.RP + a.ES + a.PHJ));
+            
+            const attackTbody = document.getElementById('attack-tbody');
+            attackTbody.innerHTML = '';
+            
+            attackData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank ${getRankClass(index + 1)}">${index + 1}</td>
+                    <td class="model-name">${item.Model}</td>
+                    ${getScoreCellHtmlAttack(item.UR)}
+                    ${getScoreCellHtmlAttack(item.VD)}
+                    ${getScoreCellHtmlAttack(item.RP)}
+                    ${getScoreCellHtmlAttack(item.ES)}
+                    ${getScoreCellHtmlAttack(item.PHJ)}
+                `;
+                attackTbody.appendChild(row);
+            });
+
+            // Render priority dilemma table
+            const priorityData = [...medEthicEvalData["Priority Dilemma"]];
+            priorityData.sort((a, b) => b.Safe - a.Safe);
+            
+            const priorityTbody = document.getElementById('priority-tbody');
+            priorityTbody.innerHTML = '';
+            
+            priorityData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank ${getRankClass(index + 1)}">${index + 1}</td>
+                    <td class="model-name">${item.Model}</td>
+                    ${getScoreCellHtmlAttack(item.Safe)}
+                    ${getScoreCellHtmlDilemma(item['-1'])}
+                    ${getScoreCellHtmlDilemma(item['0'])}
+                    ${getScoreCellHtmlDilemma(item['1'])}
+                    ${getScoreCellHtmlDilemma(item['2'])}
+                    ${getScoreCellHtmlDilemma(item['3'])}
+                `;
+                priorityTbody.appendChild(row);
+            });
+
+            // Render equilibrium dilemma table
+            const equilibriumData = [...medEthicEvalData["Equilibrium Dilemma"]];
+            equilibriumData.sort((a, b) => b.Safe - a.Safe);
+            
+            const equilibriumTbody = document.getElementById('equilibrium-tbody');
+            equilibriumTbody.innerHTML = '';
+            
+            equilibriumData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank ${getRankClass(index + 1)}">${index + 1}</td>
+                    <td class="model-name">${item.Model}</td>
+                    ${getScoreCellHtmlAttack(item.Safe)}
+                    ${getScoreCellHtmlDilemma(item['-1'])}
+                    ${getScoreCellHtmlDilemma(item['0'])}
+                    ${getScoreCellHtmlDilemma(item['1'])}
+                    ${getScoreCellHtmlDilemma(item['2'])}
+                    ${getScoreCellHtmlDilemma(item['3'])}
+                 `;
+                 equilibriumTbody.appendChild(row);
+             });
+         }
+
+        // Table sorting functionality
+        function sortTable(tableId, column) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                const aValue = parseFloat(a.cells[getColumnIndex(tableId, column)].textContent.replace('%', ''));
+                const bValue = parseFloat(b.cells[getColumnIndex(tableId, column)].textContent.replace('%', ''));
+                return bValue - aValue;
+            });
+            
+            rows.forEach((row, index) => {
+                row.querySelector('.rank').textContent = index + 1;
+                row.querySelector('.rank').className = `rank ${getRankClass(index + 1)}`;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Get column index
+        function getColumnIndex(tableId, column) {
+            const columnMap = {
+                'subjective-table': {
+                    'ComprehensiveScore': 5,
+                    'RiskRate': 3,
+                    'QualityScore': 4
+                },
+                'objective-table': {
+                    'EKAcc': 3,
+                    'DSAcc': 4,
+                    'ECAcc': 5
+                },
+                'knowledge-table': {
+                    'Accuracy': 3
+                },
+                'violation-table': {
+                    'Safe': 2
+                },
+                'attack-table': {
+                    'UR': 2,
+                    'VD': 3
+                },
+                'priority-table': {
+                    'Safe': 2
+                },
+                'equilibrium-table': {
+                    'Safe': 2
+                }
+            };
+            return columnMap[tableId][column] || 0;
+        }
+
+        // Table filtering functionality
+        function filterTable(tableId, searchTerm) {
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const modelName = row.cells[1].textContent.toLowerCase();
+                if (modelName.includes(searchTerm.toLowerCase())) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Load MedES data from JSON file
+        async function loadMedESData() {
+            try {
+                const response = await fetch('data/MedES.json');
+                medesData = await response.json();
+                renderMedESData();
+                
+                // Initialize radar charts after data is loaded
+                setTimeout(() => {
+                    if (window.medesRadarChartManager) {
+                        window.medesRadarChartManager.initMedESCharts();
+                        // Update charts with data
+                        window.medesRadarChartManager.updateMedESCharts(medesData);
+                    }
+                }, 500);
+            } catch (error) {
+                console.error('Error loading MedES data:', error);
+            }
+        }
+
+        // Load MedEthicEval data from JSON file
+        async function loadMedEthicEvalData() {
+            try {
+                const response = await fetch('data/MedEthicEval.json');
+                medEthicEvalData = await response.json();
+                renderMedEthicEvalData();
+                
+                // Initialize radar charts after data is loaded
+                setTimeout(() => {
+                    console.log('=== HTML: MedEthicEval Radar Chart Initialization ===');
+                    console.log('medEthicEvalData:', medEthicEvalData);
+                    console.log('medEthicEvalRadarChartManager exists:', !!window.medEthicEvalRadarChartManager);
+                    
+                    if (window.medEthicEvalRadarChartManager) {
+                        window.medEthicEvalRadarChartManager.initMedEthicEvalCharts();
+                        // Update charts with data
+                        console.log('Calling updateMedEthicEvalCharts with data:', medEthicEvalData);
+                        window.medEthicEvalRadarChartManager.updateMedEthicEvalCharts(medEthicEvalData);
+                    } else {
+                        console.error('medEthicEvalRadarChartManager not found!');
+                    }
+                    console.log('=== End HTML Initialization ===');
+                }, 500);
+            } catch (error) {
+                console.error('Error loading MedEthicEval data:', error);
+            }
+        }
+
+        // Initialize page after loading
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMedESData();
+            loadMedEthicEvalData();
+        });
+    </script>
+</body>
+</html>

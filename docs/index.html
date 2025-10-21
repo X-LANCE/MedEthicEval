@@ -395,6 +395,7 @@
                 <h2 class="benchmark-title">Subjective Ethical Reasoning</h2>
                 <div class="controls">
                     <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('subjective-table', this.value)">
+                    <button class="sort-btn" onclick="sortTable('subjective-table', 'QualityScore')">Sort by Quality Score</button>
                     <button class="sort-btn" onclick="sortTable('subjective-table', 'ComprehensiveScore')">Sort by Comprehensive Score</button>
                     <button class="sort-btn" onclick="sortTable('subjective-table', 'RiskRate')">Sort by Risk Rate</button>
                 </div>
@@ -486,6 +487,10 @@
                 <div class="controls">
                     <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('violation-table', this.value)">
                     <button class="sort-btn" onclick="sortTable('violation-table', 'Safe')">Sort by Safety Score</button>
+                    <button class="sort-btn" onclick="sortTable('violation-table', '-1')">Sort by Score -1</button>
+                    <button class="sort-btn" onclick="sortTable('violation-table', '0')">Sort by Score 0</button>
+                    <button class="sort-btn" onclick="sortTable('violation-table', '1')">Sort by Score 1</button>
+                    <button class="sort-btn" onclick="sortTable('violation-table', '2')">Sort by Score 2</button>
                 </div>
                 <div class="table-container">
                     <table id="violation-table">
@@ -544,6 +549,11 @@
                 <div class="controls">
                     <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('priority-table', this.value)">
                     <button class="sort-btn" onclick="sortTable('priority-table', 'Safe')">Sort by Safety Score</button>
+                    <button class="sort-btn" onclick="sortTable('priority-table', '-1')">Sort by Score -1</button>
+                    <button class="sort-btn" onclick="sortTable('priority-table', '0')">Sort by Score 0</button>
+                    <button class="sort-btn" onclick="sortTable('priority-table', '1')">Sort by Score 1</button>
+                    <button class="sort-btn" onclick="sortTable('priority-table', '2')">Sort by Score 2</button>
+                    <button class="sort-btn" onclick="sortTable('priority-table', '3')">Sort by Score 3</button>
                 </div>
                 <div class="table-container">
                     <table id="priority-table">
@@ -572,6 +582,11 @@
                 <div class="controls">
                     <input type="text" class="search-box" placeholder="Search models..." onkeyup="filterTable('equilibrium-table', this.value)">
                     <button class="sort-btn" onclick="sortTable('equilibrium-table', 'Safe')">Sort by Safety Score</button>
+                    <button class="sort-btn" onclick="sortTable('equilibrium-table', '-1')">Sort by Score -1</button>
+                    <button class="sort-btn" onclick="sortTable('equilibrium-table', '0')">Sort by Score 0</button>
+                    <button class="sort-btn" onclick="sortTable('equilibrium-table', '1')">Sort by Score 1</button>
+                    <button class="sort-btn" onclick="sortTable('equilibrium-table', '2')">Sort by Score 2</button>
+                    <button class="sort-btn" onclick="sortTable('equilibrium-table', '3')">Sort by Score 3</button>
                 </div>
                 <div class="table-container">
                     <table id="equilibrium-table">
